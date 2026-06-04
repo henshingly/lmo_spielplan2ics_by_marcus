@@ -1,7 +1,10 @@
 # spielplan2ics
 
 **Addon für Liga Manager Online (LMO)**  
-Erstellt von Marcus | Version 1.1 (24.07.2014) | Lizenz: GPL v2
+| Autor | Version | Lizenz |
+|-------|---------|--------|
+| Marcus | Version bis 1.1 | GPL v2 |  
+| Henshingly | ab Version 1.2 | GPL v2 |  
 
 ---
 
@@ -15,7 +18,7 @@ Das Script steht **vollständig unabhängig vom LMO-Verzeichnisbaum** und benöt
 
 ## Voraussetzungen
 
-- PHP 8.0 oder höher (empfohlen)
+- PHP 8.0 oder höher
 - Webserver mit PHP-Unterstützung
 - Schreibrechte im Verzeichnis des Scripts (für die Ausgabedatei `spielplan.ics`)
 
@@ -24,7 +27,7 @@ Das Script steht **vollständig unabhängig vom LMO-Verzeichnisbaum** und benöt
 ## Installation
 
 1. `spielplan2ics.php` in ein beliebiges, über den Webserver erreichbares Verzeichnis kopieren
-2. Sicherstellen dass das Verzeichnis **Schreibrechte** hat (die Ausgabedatei `spielplan.ics` wird dort erstellt)
+2. Sicherstellen dass das Verzeichnis **Schreibrechte** hat
 3. Script direkt im Browser aufrufen, z.B.:
    ```
    https://example.com/tools/spielplan2ics.php
@@ -68,10 +71,26 @@ Weitere Einträge können nach demselben Muster ergänzt werden. Der erste Eintr
 
 - Die Ausgabedatei wird mit `fopen(__DIR__ . "/spielplan.ics", "w+")` im Verzeichnis des Scripts erzeugt
 - Zeitzonen werden korrekt über `date_default_timezone_set('Europe/Berlin')` und `mktime()`/`gmdate()` verarbeitet — Sommer- und Winterzeit werden automatisch berücksichtigt
-- Jeder Kalendereintrag erhält eine eindeutige UID via `md5(uniqid('', true))`
+- Jeder Kalendereintrag erhält eine eindeutige UID im Format `hash@spielplan2ics`
 - Spieltermine werden mit einer Dauer von **2 Stunden** eingetragen
 - Die Jahresbestimmung erfolgt automatisch: Wenn die Monatsnummer sinkt (Jahreswechsel im Spielplan), wird das Folgejahr verwendet
-- Fehlerausgaben sind im Code deaktiviert (`error_reporting` auskommentiert) — für Debugging-Zwecke die entsprechende Zeile im Script aktivieren
+- Sonderzeichen (Kommas, Semikolons) in Teamnamen werden gemäß RFC 5545 korrekt escaped
+- Fehlerausgaben sind deaktiviert — für Debugging die entsprechende Zeile im Script aktivieren
+
+## ICS-Format (RFC 5545 konform)
+
+Die erzeugte Datei entspricht vollständig dem iCalendar-Standard RFC 5545 und wird von allen gängigen Kalenderanwendungen korrekt importiert:
+
+| Eigenschaft | Wert |
+|-------------|------|
+| `VERSION` | 2.0 |
+| `CALSCALE` | GREGORIAN |
+| `METHOD` | PUBLISH |
+| `PRODID` | `-//Liga Manager Online//spielplan2ics//DE` |
+| Zeilenenden | CRLF (wie RFC vorgeschrieben) |
+| Zeitzone | UTC (korrekte Umrechnung aus Europe/Berlin) |
+| Zeichensatz | UTF-8 |
+| Sonderzeichen | escaped (`\,` `\;`) |
 
 ---
 
@@ -79,7 +98,7 @@ Weitere Einträge können nach demselben Muster ergänzt werden. Der erste Eintr
 
 | Version | Datum | Änderungen |
 |---------|-------|------------|
-| 1.2 | 2025 | PHP 8.x Kompatibilität: korrekte Zeitzonenbehandlung (`mktime`/`gmdate`), `__DIR__` für Dateipfad, `uniqid('', true)` statt `uniqid(rand())`, `error_reporting` auskommentiert |
+| 1.2 | 04.06.2026 | PHP 8.x Kompatibilität: korrekte Zeitzonenbehandlung, `__DIR__`, `uniqid('', true)`, `error_reporting` auskommentiert; RFC 5545: `METHOD:PUBLISH`, `CALSCALE:GREGORIAN`, `DTSTAMP` mit Z-Suffix, `ENCODING=QUOTED-PRINTABLE` entfernt, Sonderzeichen-Escaping, eigene PRODID, UID mit Domain-Suffix |
 | 1.1 | 24.07.2014 | Skriptoptimierung; Vereinsnamen können gekürzt werden |
 | 1.0 | 23.07.2014 | Grundfunktionen |
 
