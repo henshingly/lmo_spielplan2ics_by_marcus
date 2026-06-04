@@ -22,7 +22,7 @@ Ver. 1  -  23.7.2014
 
 
 //error_reporting(E_ALL);
-error_reporting(0);
+//error_reporting(0);  // auskommentiert - Fehler werden nicht mehr unterdr�ckt
 
 echo '<!DOCTYPE HTML>
 <html>
@@ -74,7 +74,7 @@ die;*/
 
 $monat_max = 0;
 
-$datei = fopen("spielplan.ics", "w+");  
+$datei = fopen(__DIR__ . "/spielplan.ics", "w+");
 
 fwrite($datei, 'BEGIN:VCALENDAR
 PRODID:-//flaimo.com//iCal Class MIMEDIR//EN
@@ -115,14 +115,20 @@ for ($i=0; $i<count($expo); $i++) {  //-1 entfernt
 
   //DTSTART:20120711T163000Z
   //DTEND:20120711T183000Z  
-  $dtstamp = date("Ymd") . "T" . date("His");  // 20110909T093200
+  $dtstamp = gmdate("Ymd\THis");  // UTC-Zeitstempel
+  // Korrekte UTC-Konvertierung mit PHP-Zeitzonenfunktion
+  date_default_timezone_set('Europe/Berlin');
+  $ts_start = mktime((int)$zeit[0], (int)$zeit[1], 0, (int)$datum[2], (int)$datum[1], (int)$jahr);
+  $ts_end   = $ts_start + 7200;  // +2 Stunden Spielzeit
+  $dtstart  = gmdate("Ymd\THis\Z", $ts_start);
+  $dtend    = gmdate("Ymd\THis\Z", $ts_end);
 
 fwrite($datei, 'BEGIN:VEVENT
-DTSTART:' . $jahr . $datum[2] . $datum[1] . "T" . ($zeit[0] - 2) . $zeit[1] . "00Z" . '
-DTEND:' . $jahr . $datum[2] . $datum[1] . "T" . ($zeit[0] ) . $zeit[1] . "00Z" . '
+DTSTART:' . $dtstart . '
+DTEND:' . $dtend . '
 TRANSP:TRANSPARENT
 SEQUENCE:0
-UID:'.md5 ( uniqid ( rand () ) ).'
+UID:'.md5(uniqid('', true)).'
 DTSTAMP:'.$dtstamp.'
 CATEGORIES;LANGUAGE=de;ENCODING=QUOTED-PRINTABLE:Punktspiel '.$spieltag.'. Spieltag
 DESCRIPTION;LANGUAGE=de;ENCODING=QUOTED-PRINTABLE:Punktspiel '.$spieltag.'. Spieltag
@@ -155,4 +161,3 @@ echo '</body>
 
 
 ?>
-
