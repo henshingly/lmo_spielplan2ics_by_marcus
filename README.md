@@ -10,7 +10,7 @@
 
 ## Was macht dieses Addon?
 
-`spielplan2ics.php` wandelt einen kopierten LMO-Spielplan in eine ICS-Kalenderdatei um, die in gängige Kalenderanwendungen wie Google Calendar, Apple Calendar oder Outlook importiert werden kann.
+`spielplan2ics.php` wandelt einen kopierten LMO-Spielplan in eine ICS-Kalenderdatei um, die in gängige Kalenderanwendungen wie Google Calendar, Apple Calendar, Mozilla Thunderbird oder Outlook importiert werden kann.
 
 Das Script steht **vollständig unabhängig vom LMO-Verzeichnisbaum** und benötigt keine LMO-Dateien.
 
@@ -80,7 +80,7 @@ Die Zeitzone bestimmt die korrekte UTC-Umrechnung der Spielzeiten in der ICS-Dat
 Im Formular kann vor dem Erstellen ein eigener Dateiname eingegeben werden:
 
 ```
-Dateiname der ICS-Datei: [ fcbayern          ] .ics
+Dateiname der ICS-Datei: [ FC Musterstadt 1. Mannschaft ] .ics
 ```
 
 - Der Standardwert ist `spielplan`
