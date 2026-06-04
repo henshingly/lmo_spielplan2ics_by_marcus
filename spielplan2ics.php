@@ -6,10 +6,20 @@ Diese Skript erstellt aus dem kopierten Spielplan einer LMO-Liga eine ICS-Datei
 
 Voraussetzungen: 
 1.  LMO
-2.  PHP 5
+2.  PHP 8
 
 
 Versionsübersicht:
+
+Ver. 1.2  -  04.06.2026
+•  PHP 8.x Kompatibilität: korrekte Zeitzonenbehandlung
+•  __DIR__, uniqid('', true)
+•  error_reporting auskommentiert
+•  RFC 5545: METHOD:PUBLISH, CALSCALE:GREGORIAN, DTSTAMP mit Z-Suffix, ENCODING=QUOTED-PRINTABLE entfernt
+•  Sonderzeichen-Escaping
+•  eigene PRODID
+•  UID mit Domain-Suffix
+
 
 Ver. 1.1  -  24.7.2014
 •  Skriptoptimierung
@@ -22,7 +32,7 @@ Ver. 1  -  23.7.2014
 
 
 //error_reporting(E_ALL);
-//error_reporting(0);  // auskommentiert - Fehler werden nicht mehr unterdr�ckt
+//error_reporting(0);  // auskommentiert - Fehler werden nicht mehr unterdrückt
 
 echo '<!DOCTYPE HTML>
 <html>
@@ -77,9 +87,10 @@ $monat_max = 0;
 $datei = fopen(__DIR__ . "/spielplan.ics", "w+");
 
 fwrite($datei, 'BEGIN:VCALENDAR
-PRODID:-//flaimo.com//iCal Class MIMEDIR//EN
+PRODID:-//Liga Manager Online//spielplan2ics//DE
 VERSION:2.0
-METHOD:REQUEST
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
 ');
 
 
@@ -115,7 +126,7 @@ for ($i=0; $i<count($expo); $i++) {  //-1 entfernt
 
   //DTSTART:20120711T163000Z
   //DTEND:20120711T183000Z  
-  $dtstamp = gmdate("Ymd\THis");  // UTC-Zeitstempel
+  $dtstamp = gmdate("Ymd\THis\Z");  // UTC-Zeitstempel mit Z (RFC 5545)
   // Korrekte UTC-Konvertierung mit PHP-Zeitzonenfunktion
   date_default_timezone_set('Europe/Berlin');
   $ts_start = mktime((int)$zeit[0], (int)$zeit[1], 0, (int)$datum[2], (int)$datum[1], (int)$jahr);
@@ -123,16 +134,19 @@ for ($i=0; $i<count($expo); $i++) {  //-1 entfernt
   $dtstart  = gmdate("Ymd\THis\Z", $ts_start);
   $dtend    = gmdate("Ymd\THis\Z", $ts_end);
 
+  // Sonderzeichen in Teamnamen escapen (RFC 5545)
+  $spiel_ics = str_replace(array('\\', ';', ','), array('\\\\', '\\;', '\\,'), $spiel);
+
 fwrite($datei, 'BEGIN:VEVENT
 DTSTART:' . $dtstart . '
 DTEND:' . $dtend . '
 TRANSP:TRANSPARENT
 SEQUENCE:0
-UID:'.md5(uniqid('', true)).'
+UID:'.md5(uniqid('', true)).'@spielplan2ics
 DTSTAMP:'.$dtstamp.'
-CATEGORIES;LANGUAGE=de;ENCODING=QUOTED-PRINTABLE:Punktspiel '.$spieltag.'. Spieltag
-DESCRIPTION;LANGUAGE=de;ENCODING=QUOTED-PRINTABLE:Punktspiel '.$spieltag.'. Spieltag
-SUMMARY;LANGUAGE=de;ENCODING=QUOTED-PRINTABLE:'.$spiel.'
+CATEGORIES;LANGUAGE=de:Punktspiel '.$spieltag.'. Spieltag
+DESCRIPTION;LANGUAGE=de:Punktspiel '.$spieltag.'. Spieltag
+SUMMARY;LANGUAGE=de:'.$spiel_ics.'
 PRIORITY:5
 CLASS:PUBLIC
 URL:http://www.bcerlbach.de/
@@ -161,3 +175,4 @@ echo '</body>
 
 
 ?>
+
