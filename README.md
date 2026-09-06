@@ -80,7 +80,11 @@ Die Zeitzone bestimmt die korrekte UTC-Umrechnung der Spielzeiten in der ICS-Dat
 Im Formular kann vor dem Erstellen ein eigener Dateiname eingegeben werden:
 
 ```
+<<<<<<< Updated upstream
 Dateiname der ICS-Datei: [ FC Musterstadt 1. Mannschaft ] .ics
+=======
+Dateiname der ICS-Datei: [ fcbayern          ] .ics
+>>>>>>> Stashed changes
 ```
 
 - Der Standardwert ist `spielplan`
