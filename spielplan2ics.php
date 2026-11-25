@@ -12,6 +12,7 @@ Versionsübersicht:
 Ver. 1.8  -  25.11.2026
 •  Sicherheit: Ausgabe von Spielpaarungen HTML-sicher, URL-Feld ohne Leer-/Steuerzeichen (kein Einschleusen weiterer ICS-Zeilen),
    Host-Header geprüft, JavaScript des Kopier-Buttons per json_encode, Dateiname max. 80 Zeichen ohne führenden Punkt
+•  Datum mit Wochentag und Punkt (z. B. "Sa.16.08. 15:00", Standardformat im LMO) wird erkannt
 •  ICS: Zeilenenden immer CRLF, Zeilen länger als 75 Oktette werden gefaltet (RFC 5545)
 •  Fehlerbehandlung: fehlende/ungültige Formularfelder, nicht beschreibbares Verzeichnis
 •  Merge-Konflikt-Markierungen aus der Repository-Version entfernt, PSR-12-Formatierung
@@ -663,7 +664,8 @@ METHOD:PUBLISH
         $datum_clean = trim($datum_raw);
         foreach ($wochentage_liste as $wt) {
             if (mb_stripos($datum_clean, $wt) === 0) {
-                $datum_clean = trim(mb_substr($datum_clean, mb_strlen($wt)));
+                // Rest nach dem Wochentag; Punkt/Komma/Doppelpunkt direkt dahinter entfernen (z. B. "Sa.16.08. 15:00")
+                $datum_clean = ltrim(trim(mb_substr($datum_clean, mb_strlen($wt))), '.,: ');
                 break;
             }
         }
